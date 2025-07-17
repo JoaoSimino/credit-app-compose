@@ -30,7 +30,7 @@ services:
 
   billingservice:
     image: joaovsmathias/billingservice-api:latest
-    entrypoint: sh -c "sleep 15 && dotnet BillingService.API.dll"
+    entrypoint: sh -c "sleep 60 && dotnet BillingService.API.dll"
     container_name: billingservice
     ports:
       - "5155:80"
