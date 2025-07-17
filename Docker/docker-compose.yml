@@ -1,0 +1,77 @@
+version: '3.9'
+
+services:
+  apigateway:
+    image: joaovsmathias/apigateway-api:latest
+    container_name: apigateway
+    ports:
+      - "8080:80"
+    depends_on:
+      - creditscoringengine
+      - billingservice
+    networks:
+      - backend
+
+  creditscoringengine:
+    image: joaovsmathias/creditscoringengine-api:latest
+    container_name: creditscoringengine
+    ports:
+      - "5205:5205"
+    environment:
+      - ASPNETCORE_URLS=http://+:5205
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CreditScoringEngine;User Id=sa;Password=MyStr0ng!Passw0rd;TrustServerCertificate=True;
+      - RabbitMQ__HostName=rabbitmq
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    networks:
+      - backend
+
+  billingservice:
+    image: joaovsmathias/billingservice-api:latest
+    container_name: billingservice
+    ports:
+      - "5155:5155"
+    environment:
+      - ASPNETCORE_URLS=http://+:5155
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=Billing;User Id=sa;Password=MyStr0ng!Passw0rd;TrustServerCertificate=True;
+      - RabbitMQ__HostName=rabbitmq
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    networks:
+      - backend
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=MyStr0ng!Passw0rd
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"     # Porta de conexão com apps
+      - "15672:15672"   # Dashboard web
+    networks:
+      - backend
+
+  frontend:
+    image: joaovsmathias/credit-scoring-ui:latest
+    container_name: credit-scoring-ui
+    ports:
+      - "4400:80"
+    depends_on:
+      - apigateway
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
