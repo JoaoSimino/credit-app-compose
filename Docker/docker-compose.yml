@@ -17,9 +17,9 @@ services:
     entrypoint: sh -c "sleep 60 && dotnet CreditScoringEngine.API.dll"
     container_name: creditscoringengine
     ports:
-      - "5205:5205"
+      - "5205:80"
     environment:
-      - ASPNETCORE_URLS=http://+:5205
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CreditScoringEngine;User Id=sa;Password=MyStr0ng!Passw0rd;TrustServerCertificate=True;
       - RabbitMQ__HostName=rabbitmq
     depends_on:
@@ -33,9 +33,9 @@ services:
     entrypoint: sh -c "sleep 15 && dotnet BillingService.API.dll"
     container_name: billingservice
     ports:
-      - "5155:5155"
+      - "5155:80"
     environment:
-      - ASPNETCORE_URLS=http://+:5155
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=Billing;User Id=sa;Password=MyStr0ng!Passw0rd;TrustServerCertificate=True;
       - RabbitMQ__HostName=rabbitmq
     depends_on:
